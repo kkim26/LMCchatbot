@@ -117,10 +117,19 @@
         }
         .banner {
             width: 100%;  /* Make the banner full width */
-            max-width: 1200px; /* Restrict it to a max width (optional) */
             height: auto; /* Maintain aspect ratio */
         }
+        .bottom-banner-container {
+            text-align: center; /* Center the image horizontally */
+            margin-top: 20px; /* Space above the banner */
+            margin-right: 85px;
+        }
 
+        .bottom-banner {
+            width: 100%;  /* Make the banner full width */
+            max-width: 1200px; /* Restrict to a max width (optional) */
+            height: auto; /* Maintain aspect ratio */
+        }
     </style>
 </head>
 <body>
@@ -134,7 +143,7 @@
     <div class="container">
         
         <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
-        <button id="test-api-key">Test API Key</button>
+        <button id="test-api-key">Use API Key</button>
         <div id="chat-container">
             <div id="chat-messages"></div>
             <div id="user-input">
@@ -146,6 +155,9 @@
         <div class="about">
             <h2>Tell me about your interests and I will tell you activities around Tech I think you might enjoy!</h2>
         </div>
+    </div>
+    <div class="bottom-banner-container">
+        <img src="bottomBanner.png" alt="Bottom Banner" class="bottom-banner">
     </div>
 
     <script>
@@ -209,7 +221,7 @@
             log('Sending message to OpenAI API...');
             try {
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
+                    method: 'POST', 
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${apiKey}`
@@ -217,7 +229,8 @@
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
                         messages: [{role: "user", content: message}],
-                        max_tokens: 150
+                        max_tokens: 150,
+                        stream: true
                     })
                 });
 
@@ -225,15 +238,54 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim();
-                log('Received response from OpenAI API');
-                addMessageToChat('AI', aiResponse);
-            } catch (error) {
-                log(`Error: ${error.message}`);
-                addMessageToChat('AI', 'Sorry, there was an error processing your request.');
-            }
-        }
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let done = false;
+
+                // Create a new message element for the AI response
+                const aiMessageElement = document.createElement('div');
+                aiMessageElement.innerHTML = `<strong>AI:</strong> <span id="streaming-response"></span>`;
+                chatMessages.appendChild(aiMessageElement);
+                const streamingResponse = aiMessageElement.querySelector('#streaming-response');
+
+                // Read streamed chunks and update the chat in real-time
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    done = readerDone;
+
+                    // Decode the incoming chunk and process it
+                    const chunk = decoder.decode(value, { stream: true });
+
+                    // Process each line from the chunk
+                    const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);  // Remove 'data: ' from the line
+                            if (data !== '[DONE]') {
+                                try {
+                                    const parsed = JSON.parse(data);
+                                    if (parsed.choices && parsed.choices[0].delta.content) {
+                                        // Append the content to the current AI message in the chat
+                                        streamingResponse.textContent += parsed.choices[0].delta.content;
+                                        chatMessages.scrollTop = chatMessages.scrollHeight;  // Auto-scroll
+                                    }
+                                } catch (err) {
+                                    console.error('Error parsing chunk:', err);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Log and display the final message
+                        log('Received response from OpenAI API');
+
+                    } catch (error) {
+                        log(`Error: ${error.message}`);
+                        addMessageToChat('AI', 'Sorry, there was an error processing your request.');
+                    }
+                }
 
         function addMessageToChat(sender, message) {
             const messageElement = document.createElement('div');
