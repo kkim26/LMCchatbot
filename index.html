@@ -31,14 +31,15 @@
         }
         h1, h2 {
             font-family: 'Verdana', sans-serif;
-            color: #f9f9f9;
             margin-bottom: 15px;
             letter-spacing: 1px;
         }
         h1 {
-            font-size: 32px;
+            font-size: 50px;
             border-bottom: 2px solid #404040;
             padding-bottom: 10px;
+            color: #404040;
+            margin-left: 40px;
         }
         h2 {
             font-size: 18px;
@@ -46,6 +47,7 @@
             padding: 10px 20px;
             position: relative;
             margin-top: 20px;
+            color: #f9f9f9;
         }
         
         #chat-container {
@@ -109,11 +111,28 @@
             font-family: monospace;
             white-space: pre-wrap;
         }
+        .banner-container {
+            text-align: center; /* Center the image horizontally */
+            margin-bottom: 0px; /* Space below the banner */
+        }
+        .banner {
+            width: 100%;  /* Make the banner full width */
+            max-width: 1200px; /* Restrict it to a max width (optional) */
+            height: auto; /* Maintain aspect ratio */
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="banner-container">
+        <img src="banner.png" alt="Banner" class="banner">
+    </div>
+    <div class="title">
         <h1>BuzzBot</h1>
+    </div>
+
+    <div class="container">
+        
         <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
         <button id="test-api-key">Test API Key</button>
         <div id="chat-container">
