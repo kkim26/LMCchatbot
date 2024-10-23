@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple AI Chatbot</title>
+    <title>BuzzBot</title>
     <style>
         * {
             margin: 60;
@@ -12,7 +12,7 @@
         }
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4e3c3;
+            background-color: #ECE3B0;
             color: #000000;
             line-height: 1.6;
             font-size: 16px;
@@ -23,38 +23,31 @@
         .container {
             max-width: 800px;
             margin: auto;
-            background: white;
+            background: #49619B;
             padding: 40px;
             border-radius: 5px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
             flex-grow: 1;
         }
         h1, h2 {
-            font-family: 'Impact', sans-serif;
-            color: #ff4d00;
-            text-transform: uppercase;
+            font-family: 'Verdana', sans-serif;
+            color: #f9f9f9;
             margin-bottom: 15px;
             letter-spacing: 1px;
         }
         h1 {
             font-size: 32px;
-            border-bottom: 2px solid #ff4d00;
+            border-bottom: 2px solid #404040;
             padding-bottom: 10px;
         }
         h2 {
-            font-size: 24px;
-            background-color: rgba(211, 211, 211, 0.3);
+            font-size: 18px;
+            background-color: #49619B;
             padding: 10px 20px;
             position: relative;
             margin-top: 20px;
         }
-        h2::before {
-            content: '🤖';
-            position: absolute;
-            left: -25px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+        
         #chat-container {
             border: 1px solid #d4c4a8;
             border-radius: 5px;
@@ -80,7 +73,7 @@
             border-radius: 3px;
         }
         button {
-            background-color: #ff4d00;
+            background-color: #404040;
             color: white;
             border: none;
             padding: 5px 10px;
@@ -102,7 +95,7 @@
             margin-top: 20px;
         }
         .about a {
-            color: #ff4d00;
+            color: #404040;
             text-decoration: none;
         }
         .about a:hover {
@@ -120,7 +113,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Simple AI Chatbot</h1>
+        <h1>BuzzBot</h1>
         <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
         <button id="test-api-key">Test API Key</button>
         <div id="chat-container">
@@ -132,15 +125,7 @@
         </div>
         <div id="console-output"></div>
         <div class="about">
-            <h2>How It Works</h2>
-            <p>This chatbot uses the OpenAI API to generate responses. Here's a brief overview of its components:</p>
-            <ul>
-                <li>HTML: Structures the page and chat interface</li>
-                <li>CSS: Styles the page for a user-friendly experience</li>
-                <li>JavaScript: Handles user input, API calls, and response rendering</li>
-                <li>API Integration: Connects to OpenAI for AI-powered responses</li>
-            </ul>
-            <p>To use this chatbot, enter your OpenAI API key in the input field above. The API key is not saved or stored anywhere.</p>
+            <h2>Tell me about your interests and I will tell you activities around Tech I think you might enjoy!</h2>
         </div>
     </div>
 
