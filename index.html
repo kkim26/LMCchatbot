@@ -209,6 +209,7 @@
                 log(`Error testing API key: ${error.message}`);
             }
         }
+        let messageCount = 0;
     
         async function sendMessage() {
             const message = messageInput.value.trim();
@@ -225,6 +226,7 @@
     
             addMessageToChat('User', message); // Add the user's message to the chat
             messageInput.value = ''; // Clear the input box
+            messageCount++;
     
             log('Sending message to OpenAI API...');
     
@@ -261,6 +263,11 @@
                     const personalizedResponse = "Buzzing with excitement for you! 🐝 You're definitely Tech material. Keep flying high!";
                     log('Received response from OpenAI API');
                     addMessageToChat('AI', personalizedResponse);
+                }
+                if (messageCount % 5 === 0) {
+                const joke = getBuzzJoke();
+                addMessageToChat('Buzz', joke);
+
                 } else {
                     // Add the AI's response to chat
                     log('Received response from OpenAI API');
@@ -283,15 +290,40 @@
         function getBuzzCatchphrase(message) {
             const catchphrases = [
                 "Keep buzzing, you're doing great! 🐝",
-                "That’s how you swarm the challenge! 💪",
-                "Buzz buzz, mission accomplished! 🎯",
-                "You're flying through it! 🐝🚀",
-                "Just like Buzz, you're on the fast track to success! 🏁"
+            "That’s how you swarm the challenge! 💪",
+            "Buzz buzz, mission accomplished! 🎯",
+            "You're flying through it! 🐝🚀",
+            "Just like Buzz, you're on the fast track to success! 🏁",
+            "You’ve got the wings to take on anything! 🐝",
+            "Don’t just fly, soar like Buzz! 🚀",
+            "Bee-lieve in yourself and go far! 🐝✨",
+            "No need to wing it, you've got this in the bag! 🎒",
+            "Stingers up! Victory's near! 🐝💥",
+            "Get ready to swarm the competition! 🔥🐝",
+            "You're buzzing through this like a pro!",
+            "Nailed it, just like a true Yellow Jacket! 🐝"
             ];
     
             // Randomly pick a catchphrase and append to the message
             const randomCatchphrase = catchphrases[Math.floor(Math.random() * catchphrases.length)];
             return `${message} ${randomCatchphrase}`;
+        }
+        function getBuzzJoke() {
+            const jokes = [
+                "Why don’t Yellow Jackets ever get lost? Because they always follow the buzz! 🐝",
+                "How do Yellow Jackets communicate? Through buzzwords! 😆",
+                "Why did Buzz join the debate team? To always have a sting in his argument! 🐝",
+                "What’s Buzz’s favorite exercise? Cardio-buzz! 🐝🏃",
+                "Why did Buzz bring a suitcase to the game? He was ready to swarm and conquer! 🏆🐝",
+                "What does Buzz say before a race? Bee prepared! 🏃‍♂️🐝",
+                "Why did the Yellow Jacket sit at the computer? To debug the competition! 🖥️🐝",
+                "A uGA fan is walking down the street with a pig under his arm. Someone comes up and says “Where’d you get that?”The pig says, “I won him at the fair.”",
+                "How do you get the uga Rhodes scholar off your front porch? You pay him for your pizza.",
+                "At the Tech uga game, some uga students threw firecrackers at the Tech students, the tech students lit them and threw them back."
+
+            ];
+
+        return jokes[Math.floor(Math.random() * jokes.length)];
         }
     
         window.addEventListener('load', () => {
