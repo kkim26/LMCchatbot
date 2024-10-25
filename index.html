@@ -312,7 +312,7 @@
                     },
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
-                        messages: [{ role: "user", content: `Answer only with information related to Georgia Tech. Be sure to avoid general or non-Georgia Tech content. Here’s the question: ${message}` }], // Send user message as input
+                        messages: [{ role: "user", content: `Answer only with information related to Georgia Tech. Be sure to avoid general or non-Georgia Tech content. Also if they list interests or hobbies be sure to include clubs or activities at Georgia Tech that are similar. Here’s the question: ${message}` }], // Send user message as input
                         max_tokens: 150,
                         stream: true
                     })
