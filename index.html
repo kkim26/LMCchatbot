@@ -26,7 +26,6 @@
             display: flex;
             justify-content: space-between; /* Ensure space between main content and avatar viewer */
             align-items: flex-start; /* Align items at the top */
-            gap: 20px; /* Optional: space between the two columns */
             padding: 20px; /* Adjust as needed */
         }
 
@@ -42,7 +41,12 @@
             width: 300px; /* Fixed width for the avatar viewer */
             max-width: 100%; /* Ensure responsiveness */
             display: flex;
+            flex-direction: column;
 
+        }
+        .loading-indicator {
+            color:#49619B;
+            font-family: Arial, sans-serif;
         }
         model-viewer {
             width: 100%;
@@ -50,6 +54,8 @@
             border-radius: 10px;
             background-color: #FFFFFF;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin-right: 20px;
+            display: flex;
         }
         h1, h2 {
             font-family: 'Verdana', sans-serif;
@@ -180,7 +186,8 @@
             </div>
         </div>
         <div class="avatar-viewer-container">
-            <model-viewer src="https://models.readyplayer.me/671bd61fcd48f07da4714e9f.glb" alt="Ready Player Me Avatar" auto-rotate camera-controls></model-viewer>
+            <div id="loading-indicator" style="display: none;">Thinking...</div>
+            <model-viewer src="https://models.readyplayer.me/671bd61fcd48f07da4714e9f.glb" alt="Ready Player Me Avatar" ></model-viewer>
         </div>
         
     </div>
@@ -239,7 +246,7 @@
             }
         }
         let messageCount = 0;
-    
+
         async function sendMessage() {
             const message = messageInput.value.trim();
             const apiKey = apiKeyInput.value.trim();
@@ -258,6 +265,7 @@
             messageCount++;
     
             log('Sending message to OpenAI API...');
+            document.getElementById('loading-indicator').style.display = 'block';
     
             try {
                 // Call the OpenAI API with the user's message
@@ -289,6 +297,7 @@
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let done = false;
+
 
     
                 // Parse the response
@@ -337,9 +346,14 @@
                 } else {
                     streamingResponse.textContent += ` ${getBuzzCatchphrase("")}`;
                 }
+
             } catch (error) {
                 log(`Error: ${error.message}`);
                 addMessageToChat('AI', 'Sorry, there was an error processing your request.'); // Error message
+               
+            } finally {
+                // Hide loading indicator after response is received
+                document.getElementById('loading-indicator').style.display = 'none';
             }
         }
     
