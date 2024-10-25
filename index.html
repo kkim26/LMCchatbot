@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BuzzBot</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
     <style>
         * {
             margin:0;
@@ -20,14 +22,34 @@
             display: flex;
             flex-direction: column;
         }
+        .main-content {
+            display: flex;
+            justify-content: space-between; /* Ensure space between main content and avatar viewer */
+            align-items: flex-start; /* Align items at the top */
+            gap: 20px; /* Optional: space between the two columns */
+            padding: 20px; /* Adjust as needed */
+        }
+
         .container {
             max-width: 800px;
-            margin-left: 30px;
             background: #49619B;
             padding: 40px;
             border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             flex-grow: 1;
+        }
+        .avatar-viewer-container {
+            width: 300px; /* Fixed width for the avatar viewer */
+            max-width: 100%; /* Ensure responsiveness */
+            display: flex;
+
+        }
+        model-viewer {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
         h1, h2 {
             font-family: 'Verdana', sans-serif;
@@ -139,23 +161,30 @@
     <div class="title">
         <h1>BuzzBot</h1>
     </div>
-
-    <div class="container">
+    <div class = "main-content">
+        <div class="container">
         
-        <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
-        <button id="test-api-key">Use API Key</button>
-        <div id="chat-container">
-            <div id="chat-messages"></div>
-            <div id="user-input">
-                <input type="text" id="message-input" placeholder="Type your message...">
-                <button id="send-button">Send</button>
+            <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
+            <button id="test-api-key">Use API Key</button>
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <div id="user-input">
+                    <input type="text" id="message-input" placeholder="Type your message...">
+                    <button id="send-button">Send</button>
+                </div>
+            </div>
+            
+            <div id="console-output"></div>
+            <div class="about">
+                <h2>Tell me about your interests and I will tell you activities around Tech I think you might enjoy!</h2>
             </div>
         </div>
-        <div id="console-output"></div>
-        <div class="about">
-            <h2>Tell me about your interests and I will tell you activities around Tech I think you might enjoy!</h2>
+        <div class="avatar-viewer-container">
+            <model-viewer src="https://models.readyplayer.me/671bd61fcd48f07da4714e9f.glb" alt="Ready Player Me Avatar" auto-rotate camera-controls></model-viewer>
         </div>
+        
     </div>
+   
     <div class="bottom-banner-container">
         <img src="bottomBanner.png" alt="Bottom Banner" class="bottom-banner">
     </div>
