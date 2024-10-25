@@ -251,7 +251,7 @@
         }
         let messageCount = 0;
         const avatarElement = document.getElementById('avatar');
-
+        //library of photos to make "animation"
         const talkingImages = [
 
             'avatarOpen.png',
@@ -262,7 +262,7 @@
             'avatarOpenSmall.png',
             'avatarClosed.png' 
         ];
-
+        //Animate the character to "talk", start 
         function startTalkingAnimation() {
             let currentIndex = 0;
 
@@ -273,13 +273,13 @@
 
             return talkingInterval; // Return the interval ID for stopping later
         }
-
+        //Stop the animation
         function stopTalkingAnimation(talkingInterval) {
             clearInterval(talkingInterval);
             avatarElement.src = 'avatarClosed.png'; // Reset to neutral image
         }
 
-
+        //Make sure API key is entered
         async function sendMessage() {
             const message = messageInput.value.trim();
             const apiKey = apiKeyInput.value.trim();
@@ -298,6 +298,7 @@
             messageCount++;
     
             log('Sending message to OpenAI API...');
+            //"Thinking" indicator 
             document.getElementById('loading-indicator').style.display = 'block';
             const talkingInterval = startTalkingAnimation();
             
@@ -333,19 +334,17 @@
                 const decoder = new TextDecoder();
                 let done = false;
 
-
-    
-                // Parse the response
-                //const data = await response.json();
-                //const aiResponse = data.choices[0].message.content.trim(); // Extract the AI's response
     
                 // Check for admissions-related keywords in the user message
                 const admissionKeywords = ["admissions", "apply", "application", "enrollment", "tuition", "financial aid"];
                 const lowerCaseMessage = message.toLowerCase();
                 let isAdmissionMessage = admissionKeywords.some(keyword => lowerCaseMessage.includes(keyword));
 
-                
-                 // Handle each chunk for real-time streaming
+                // Parse the response
+                //const data = await response.json();
+                //const aiResponse = data.choices[0].message.content.trim(); 
+                // Extract the AI's response
+                // Handle each chunk for real-time streaming
                 while (!done) {
                     const { value, done: readerDone } = await reader.read();
                     done = readerDone;
@@ -394,7 +393,7 @@
                 stopTalkingAnimation(talkingInterval);
             }
         }
-    
+        //add message to log
         function addMessageToChat(sender, message) {
             const messageElement = document.createElement('div');
             messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
@@ -424,6 +423,7 @@
             const randomCatchphrase = catchphrases[Math.floor(Math.random() * catchphrases.length)];
             return `${message} ${randomCatchphrase}`;
         }
+        //library of jokes to add to responses
         function getBuzzJoke() {
             const jokes = [
                 "Why don’t Yellow Jackets ever get lost? Because they always follow the buzz! 🐝",
