@@ -6,7 +6,7 @@
     <title>Simple AI Chatbot</title>
     <style>
         * {
-            margin: 60;
+            margin:0;
             padding: 0;
             box-sizing: border-box;
         }
@@ -151,26 +151,32 @@
         const apiKeyInput = document.getElementById('api-key-input');
         const testApiKeyButton = document.getElementById('test-api-key');
         const consoleOutput = document.getElementById('console-output');
-
+    
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
         testApiKeyButton.addEventListener('click', testApiKey);
-
+    
         function log(message) {
             console.log(message);
             consoleOutput.textContent += message + '\n';
             consoleOutput.scrollTop = consoleOutput.scrollHeight;
         }
-
+    
+        // Test and save the API key
         async function testApiKey() {
             const apiKey = apiKeyInput.value.trim();
+    
             if (!apiKey) {
                 log('Please enter an API key.');
                 return;
             }
-
+    
+            // Save API key to local storage
+            localStorage.setItem('apiKey', apiKey);
+            log('API key saved locally.');
+    
             log('Testing API key...');
             try {
                 const response = await fetch('https://api.openai.com/v1/engines', {
@@ -178,7 +184,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     }
                 });
-
+    
                 if (response.ok) {
                     log('API key is valid!');
                 } else {
@@ -188,22 +194,27 @@
                 log(`Error testing API key: ${error.message}`);
             }
         }
-
+    
         async function sendMessage() {
             const message = messageInput.value.trim();
             const apiKey = apiKeyInput.value.trim();
-
-            if (!message) return;
+    
+            if (!message) {
+                log('Please enter a message before sending.');
+                return;
+            }
             if (!apiKey) {
                 log('Please enter an API key before sending a message.');
                 return;
             }
-
-            addMessageToChat('User', message);
-            messageInput.value = '';
-
+    
+            addMessageToChat('User', message); // Add the user's message to the chat
+            messageInput.value = ''; // Clear the input box
+    
             log('Sending message to OpenAI API...');
+    
             try {
+                // Call the OpenAI API with the user's message
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -212,31 +223,69 @@
                     },
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
-                        messages: [{role: "user", content: message}],
+                        messages: [{ role: "user", content: message }], // Send user message as input
                         max_tokens: 150
                     })
                 });
-
+    
+                // Check for response status
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+    
+                // Parse the response
                 const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim();
-                log('Received response from OpenAI API');
-                addMessageToChat('AI', aiResponse);
+                const aiResponse = data.choices[0].message.content.trim(); // Extract the AI's response
+    
+                // Check for admissions-related keywords in the user message
+                const admissionKeywords = ["admissions", "apply", "application", "enrollment", "tuition", "financial aid"];
+                const lowerCaseMessage = message.toLowerCase();
+    
+                // Customize the AI response if admissions-related keywords are found
+                if (admissionKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
+                    const personalizedResponse = "Buzzing with excitement for you! 🐝 You're definitely Tech material. Keep flying high!";
+                    log('Received response from OpenAI API');
+                    addMessageToChat('AI', personalizedResponse);
+                } else {
+                    // Add the AI's response to chat
+                    log('Received response from OpenAI API');
+                    addMessageToChat('AI', getBuzzCatchphrase(aiResponse)); // Add Buzz personality
+                }
             } catch (error) {
                 log(`Error: ${error.message}`);
-                addMessageToChat('AI', 'Sorry, there was an error processing your request.');
+                addMessageToChat('AI', 'Sorry, there was an error processing your request.'); // Error message
             }
         }
-
+    
         function addMessageToChat(sender, message) {
             const messageElement = document.createElement('div');
             messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+    
+        // Get a Buzz-style catchphrase for the AI response
+        function getBuzzCatchphrase(message) {
+            const catchphrases = [
+                "Keep buzzing, you're doing great! 🐝",
+                "That’s how you swarm the challenge! 💪",
+                "Buzz buzz, mission accomplished! 🎯",
+                "You're flying through it! 🐝🚀",
+                "Just like Buzz, you're on the fast track to success! 🏁"
+            ];
+    
+            // Randomly pick a catchphrase and append to the message
+            const randomCatchphrase = catchphrases[Math.floor(Math.random() * catchphrases.length)];
+            return `${message} ${randomCatchphrase}`;
+        }
+    
+        window.addEventListener('load', () => {
+            const savedApiKey = localStorage.getItem('apiKey');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+                log('Loaded saved API key.');
+            }
+        });
     </script>
 </body>
 </html>
