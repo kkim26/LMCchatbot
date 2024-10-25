@@ -241,7 +241,8 @@
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
                         messages: [{ role: "user", content: message }], // Send user message as input
-                        max_tokens: 150
+                        max_tokens: 150,
+                        stream: true
                     })
                 });
     
@@ -249,29 +250,63 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                 // Create a new AI message element for the streamed response
+                const aiMessageElement = document.createElement('div');
+                aiMessageElement.innerHTML = `<strong>AI:</strong> <span id="streaming-response-${messageCount}"></span>`;
+                chatMessages.appendChild(aiMessageElement);
+                const streamingResponse = aiMessageElement.querySelector(`#streaming-response-${messageCount}`);
+
+                // Stream and parse chunks
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let done = false;
+
     
                 // Parse the response
-                const data = await response.json();
-                const aiResponse = data.choices[0].message.content.trim(); // Extract the AI's response
+                //const data = await response.json();
+                //const aiResponse = data.choices[0].message.content.trim(); // Extract the AI's response
     
                 // Check for admissions-related keywords in the user message
                 const admissionKeywords = ["admissions", "apply", "application", "enrollment", "tuition", "financial aid"];
                 const lowerCaseMessage = message.toLowerCase();
+                let isAdmissionMessage = admissionKeywords.some(keyword => lowerCaseMessage.includes(keyword));
+
+
+                 // Handle each chunk for real-time streaming
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    done = readerDone;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);  // Remove 'data: ' prefix
+                            if (data !== '[DONE]') {
+                                try {
+                                    const parsed = JSON.parse(data);
+                                    if (parsed.choices && parsed.choices[0].delta.content) {
+                                        streamingResponse.textContent += parsed.choices[0].delta.content;
+                                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                                    }
+                                } catch (err) {
+                                    console.error('Error parsing stream:', err);
+                                }
+                            }
+                        }
+                    }
+                }
+
     
                 // Customize the AI response if admissions-related keywords are found
-                if (admissionKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
-                    const personalizedResponse = "Buzzing with excitement for you! 🐝 You're definitely Tech material. Keep flying high!";
-                    log('Received response from OpenAI API');
-                    addMessageToChat('AI', personalizedResponse);
-                }
-                if (messageCount % 5 === 0) {
-                const joke = getBuzzJoke();
-                addMessageToChat('Buzz', joke);
-
+                // Add personalized message or joke based on context
+                if (isAdmissionMessage) {
+                    streamingResponse.textContent += " Buzzing with excitement for you! 🐝 You're definitely Tech material. Keep flying high!";
+                } else if (messageCount % 5 === 0) {
+                    streamingResponse.textContent += ` ${getBuzzJoke()}`;
                 } else {
-                    // Add the AI's response to chat
-                    log('Received response from OpenAI API');
-                    addMessageToChat('AI', getBuzzCatchphrase(aiResponse)); // Add Buzz personality
+                    streamingResponse.textContent += ` ${getBuzzCatchphrase("")}`;
                 }
             } catch (error) {
                 log(`Error: ${error.message}`);
