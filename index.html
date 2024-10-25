@@ -312,7 +312,7 @@
                     },
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
-                        messages: [{ role: "user", content: message }], // Send user message as input
+                        messages: [{ role: "user", content: `Answer only with information related to Georgia Tech. Be sure to avoid general or non-Georgia Tech content. Here’s the question: ${message}` }], // Send user message as input
                         max_tokens: 150,
                         stream: true
                     })
@@ -369,6 +369,9 @@
                             }
                         }
                     }
+                }
+                if (!streamingResponse.textContent.toLowerCase().includes('georgia tech','gt','tech tower','crc','campus','georgia institute of technology','georgia tech admissions','student center','clubs')) {
+                    streamingResponse.textContent = "Sorry, I can only answer questions specifically about Georgia Tech.";
                 }
     
                 // Customize the AI response if admissions-related keywords are found
