@@ -188,7 +188,7 @@
         </div>
         <div class="avatar-viewer-container">
             <div id="loading-indicator" style="display: none;">Thinking...</div>
-            <model-viewer src="https://models.readyplayer.me/671bd61fcd48f07da4714e9f.glb" alt="Ready Player Me Avatar" ></model-viewer>
+            <img id="avatar" src="avatarClosed.png" alt="Avatar" />
         </div>
         
     </div>
@@ -247,6 +247,29 @@
             }
         }
         let messageCount = 0;
+        const avatarElement = document.getElementById('avatar');
+
+        const talkingImages = [
+            'avatarOpen.png',
+            'avatarClosed.png',
+        ];
+
+        function startTalkingAnimation() {
+            let currentIndex = 0;
+
+            const talkingInterval = setInterval(() => {
+                avatarElement.src = talkingImages[currentIndex];
+                currentIndex = (currentIndex + 1) % talkingImages.length;
+            }, 300); // Change image every 300 milliseconds
+
+            return talkingInterval; // Return the interval ID for stopping later
+        }
+
+        function stopTalkingAnimation(talkingInterval) {
+            clearInterval(talkingInterval);
+            avatarElement.src = 'avatarClosed.png'; // Reset to neutral image
+        }
+
 
         async function sendMessage() {
             const message = messageInput.value.trim();
@@ -267,6 +290,8 @@
     
             log('Sending message to OpenAI API...');
             document.getElementById('loading-indicator').style.display = 'block';
+            const talkingInterval = startTalkingAnimation();
+            
     
             try {
                 // Call the OpenAI API with the user's message
@@ -310,7 +335,7 @@
                 const lowerCaseMessage = message.toLowerCase();
                 let isAdmissionMessage = admissionKeywords.some(keyword => lowerCaseMessage.includes(keyword));
 
-
+                
                  // Handle each chunk for real-time streaming
                 while (!done) {
                     const { value, done: readerDone } = await reader.read();
@@ -336,7 +361,6 @@
                         }
                     }
                 }
-
     
                 // Customize the AI response if admissions-related keywords are found
                 // Add personalized message or joke based on context
@@ -355,6 +379,7 @@
             } finally {
                 // Hide loading indicator after response is received
                 document.getElementById('loading-indicator').style.display = 'none';
+                stopTalkingAnimation(talkingInterval);
             }
         }
     
